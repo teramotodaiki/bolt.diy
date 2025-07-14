@@ -24,7 +24,7 @@ import OpenAIProvider from './providers/openai';
  */
 
 export {
-  AnthropicProvider,
+  OpenAIProvider,
 
   /*
    * CohereProvider,
@@ -36,7 +36,7 @@ export {
    * MistralProvider,
    * OllamaProvider,
    */
-  OpenAIProvider,
+  AnthropicProvider,
 
   /*
    * OpenRouterProvider,
