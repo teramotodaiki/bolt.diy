@@ -22,15 +22,36 @@ export default class AnthropicProvider extends BaseProvider {
   ];
 
   async getDynamicModels(
-    _apiKeys?: Record<string, string>,
-    _settings?: IProviderSetting,
-    _serverEnv?: Record<string, string>,
+    apiKeys?: Record<string, string>,
+    settings?: IProviderSetting,
+    serverEnv?: Record<string, string>,
   ): Promise<ModelInfo[]> {
-    /*
-     * Only return empty array to disable dynamic model fetching
-     * and use only staticModels
-     */
-    return [];
+    const { apiKey } = this.getProviderBaseUrlAndKey({
+      apiKeys,
+      providerSettings: settings,
+      serverEnv: serverEnv as any,
+      defaultBaseUrlKey: '',
+      defaultApiTokenKey: 'ANTHROPIC_API_KEY',
+    });
+
+    if (!apiKey) {
+      throw `Missing Api Key configuration for ${this.name} provider`;
+    }
+
+    // Note: Anthropic doesn't provide a models endpoint, so we return commonly available models
+    const anthropicModels = [
+      { name: 'claude-3-opus-20240229', label: 'Claude 3 Opus (Anthropic)', maxTokenAllowed: 128000 },
+      { name: 'claude-3-sonnet-20240229', label: 'Claude 3 Sonnet (Anthropic)', maxTokenAllowed: 128000 },
+      { name: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku (Anthropic)', maxTokenAllowed: 128000 },
+      { name: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet (Anthropic)', maxTokenAllowed: 128000 },
+      { name: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku (Anthropic)', maxTokenAllowed: 128000 },
+      { name: 'claude-3-7-sonnet-20250219', label: 'Claude 4 Sonnet (Anthropic)', maxTokenAllowed: 128000 },
+    ];
+
+    return anthropicModels.map((model) => ({
+      ...model,
+      provider: this.name,
+    }));
   }
 
   getModelInstance: (options: {

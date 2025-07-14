@@ -15,15 +15,40 @@ export default class OpenAIProvider extends BaseProvider {
   staticModels: ModelInfo[] = [{ name: 'o3-mini', label: 'OpenAI o3-mini', provider: 'OpenAI', maxTokenAllowed: 8000 }];
 
   async getDynamicModels(
-    _apiKeys?: Record<string, string>,
-    _settings?: IProviderSetting,
-    _serverEnv?: Record<string, string>,
+    apiKeys?: Record<string, string>,
+    settings?: IProviderSetting,
+    serverEnv?: Record<string, string>,
   ): Promise<ModelInfo[]> {
-    /*
-     * Only return empty array to disable dynamic model fetching
-     * and use only staticModels
-     */
-    return [];
+    const { apiKey } = this.getProviderBaseUrlAndKey({
+      apiKeys,
+      providerSettings: settings,
+      serverEnv: serverEnv as any,
+      defaultBaseUrlKey: '',
+      defaultApiTokenKey: 'OPENAI_API_KEY',
+    });
+
+    if (!apiKey) {
+      throw `Missing Api Key configuration for ${this.name} provider`;
+    }
+
+    const response = await fetch(`https://api.openai.com/v1/models`, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+
+    const res = (await response.json()) as any;
+
+    const data = res.data.filter(
+      (model: any) => model.object === 'model' && model.id.startsWith('gpt-') || model.id.startsWith('o1-') || model.id.startsWith('o3-'),
+    );
+
+    return data.map((m: any) => ({
+      name: m.id,
+      label: `${m.id} (OpenAI)`,
+      provider: this.name,
+      maxTokenAllowed: m.id.includes('32k') ? 32000 : m.id.includes('16k') ? 16000 : 8000,
+    }));
   }
 
   getModelInstance(options: {
