@@ -83,7 +83,7 @@ export function useSettings(): UseSettingsReturn {
     const storedSettings = getLocalStorage('settings');
     return {
       theme: storedSettings?.theme || 'system',
-      language: storedSettings?.language || 'en',
+      language: storedSettings?.language || 'ja',
       notifications: storedSettings?.notifications ?? true,
       eventLogs: storedSettings?.eventLogs ?? true,
       timezone: storedSettings?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
