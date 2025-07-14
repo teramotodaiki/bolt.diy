@@ -12,17 +12,17 @@ export default class OpenAIProvider extends BaseProvider {
     apiTokenKey: 'OPENAI_API_KEY',
   };
 
-  staticModels: ModelInfo[] = [
-    { name: 'o3-mini', label: 'OpenAI o3-mini', provider: 'OpenAI', maxTokenAllowed: 8000 },
-  ];
+  staticModels: ModelInfo[] = [{ name: 'o3-mini', label: 'OpenAI o3-mini', provider: 'OpenAI', maxTokenAllowed: 8000 }];
 
   async getDynamicModels(
-    apiKeys?: Record<string, string>,
-    settings?: IProviderSetting,
-    serverEnv?: Record<string, string>,
+    _apiKeys?: Record<string, string>,
+    _settings?: IProviderSetting,
+    _serverEnv?: Record<string, string>,
   ): Promise<ModelInfo[]> {
-    // Only return empty array to disable dynamic model fetching
-    // and use only staticModels
+    /*
+     * Only return empty array to disable dynamic model fetching
+     * and use only staticModels
+     */
     return [];
   }
 
