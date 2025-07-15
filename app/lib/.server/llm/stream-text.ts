@@ -203,5 +203,10 @@ export async function streamText(props: {
     maxTokens: dynamicMaxTokens,
     messages: convertToCoreMessages(processedMessages as any),
     ...options,
+    ...(provider.name === 'Anthropic' && {
+      experimental_cacheControl: {
+        type: 'ephemeral',
+      },
+    }),
   });
 }

@@ -40,7 +40,10 @@ export default class OpenAIProvider extends BaseProvider {
     const res = (await response.json()) as any;
 
     const data = res.data.filter(
-      (model: any) => model.object === 'model' && model.id.startsWith('gpt-') || model.id.startsWith('o1-') || model.id.startsWith('o3-'),
+      (model: any) =>
+        (model.object === 'model' && model.id.startsWith('gpt-')) ||
+        model.id.startsWith('o1-') ||
+        model.id.startsWith('o3-'),
     );
 
     return data.map((m: any) => ({

@@ -185,6 +185,11 @@ Please provide a summary of the chat till now including the hitorical summary of
       apiKeys,
       providerSettings,
     }),
+    ...(provider.name === 'Anthropic' && {
+      experimental_cacheControl: {
+        type: 'ephemeral',
+      },
+    }),
   });
 
   const response = resp.text;

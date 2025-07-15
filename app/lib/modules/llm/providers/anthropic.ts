@@ -70,7 +70,7 @@ export default class AnthropicProvider extends BaseProvider {
     });
     const anthropic = createAnthropic({
       apiKey,
-      headers: { 'anthropic-beta': 'output-128k-2025-02-19' },
+      headers: { 'anthropic-beta': 'output-128k-2025-02-19,prompt-caching-2024-07-31' },
     });
 
     return anthropic(model);
