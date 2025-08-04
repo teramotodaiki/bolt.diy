@@ -174,11 +174,6 @@ export async function selectContext(props: {
       apiKeys,
       providerSettings,
     }),
-    ...(provider.name === 'Anthropic' && {
-      experimental_cacheControl: {
-        type: 'ephemeral',
-      },
-    }),
   });
 
   const response = resp.text;
