@@ -1,4 +1,10 @@
-import { convertToCoreMessages, streamText as _streamText, type Message } from 'ai';
+import {
+  convertToCoreMessages,
+  streamText as _streamText,
+  type Message,
+  type CoreSystemMessage,
+  type CoreMessage,
+} from 'ai';
 import { MAX_TOKENS, type FileMap } from './constants';
 import { getSystemPrompt } from '~/lib/common/prompts/prompts';
 import { DEFAULT_MODEL, DEFAULT_PROVIDER, MODIFICATIONS_TAG_NAME, PROVIDER_LIST, WORK_DIR } from '~/utils/constants';
@@ -192,6 +198,12 @@ export async function streamText(props: {
 
   // console.log(systemPrompt, processedMessages);
 
+  const systemMessage: CoreMessage = {
+    role: 'system',
+    content: chatMode === 'build' ? systemPrompt : discussPrompt(),
+    providerOptions: { anthropic: { cacheControl: { type: 'ephemeral' } } },
+  };
+
   return await _streamText({
     model: provider.getModelInstance({
       model: modelDetails.name,
@@ -199,9 +211,8 @@ export async function streamText(props: {
       apiKeys,
       providerSettings,
     }),
-    system: chatMode === 'build' ? systemPrompt : discussPrompt(),
     maxTokens: dynamicMaxTokens,
-    messages: convertToCoreMessages(processedMessages as any),
+    messages: [systemMessage, ...convertToCoreMessages(processedMessages as any)],
     ...options,
   });
 }

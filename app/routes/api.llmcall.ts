@@ -112,8 +112,12 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
       logger.info(`Generating response Provider: ${provider.name}, Model: ${modelDetails.name}`);
 
       const result = await generateText({
-        system,
         messages: [
+          {
+            role: 'system',
+            content: system,
+            providerOptions: { anthropic: { cacheControl: { type: 'ephemeral' } } },
+          },
           {
             role: 'user',
             content: `${message}`,
