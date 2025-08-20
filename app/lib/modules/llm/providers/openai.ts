@@ -12,7 +12,10 @@ export default class OpenAIProvider extends BaseProvider {
     apiTokenKey: 'OPENAI_API_KEY',
   };
 
-  staticModels: ModelInfo[] = [{ name: 'o3-mini', label: 'OpenAI o3-mini', provider: 'OpenAI', maxTokenAllowed: 8000 }];
+  staticModels: ModelInfo[] = [
+    { name: 'o3-mini', label: 'OpenAI o3-mini', provider: 'OpenAI', maxTokenAllowed: 8000 },
+    { name: 'gpt-5', label: 'OpenAI GPT-5', provider: 'OpenAI', maxTokenAllowed: 8000 },
+  ];
 
   async getDynamicModels(
     apiKeys?: Record<string, string>,
@@ -78,6 +81,49 @@ export default class OpenAIProvider extends BaseProvider {
       apiKey,
     });
 
-    return openai(model);
+    const baseModel = openai(model);
+
+    // GPT-5 特別対応: max_tokens -> max_completion_tokens
+    if (model === 'gpt-5') {
+      const originalDoGenerate = baseModel.doGenerate;
+
+      baseModel.doGenerate = async function (options) {
+        const modifiedOptions = { ...options } as any;
+
+        // GPT-5の制約に対応
+        if (options.maxTokens) {
+          delete modifiedOptions.maxTokens;
+          modifiedOptions.max_completion_tokens = options.maxTokens;
+        }
+
+        // GPT-5はtemperature=1のみサポート
+        if (modifiedOptions.temperature !== undefined && modifiedOptions.temperature !== 1) {
+          delete modifiedOptions.temperature;
+        }
+
+        return originalDoGenerate.call(this, modifiedOptions);
+      };
+
+      const originalDoStream = baseModel.doStream;
+
+      baseModel.doStream = async function (options) {
+        const modifiedOptions = { ...options } as any;
+
+        // GPT-5の制約に対応
+        if (options.maxTokens) {
+          delete modifiedOptions.maxTokens;
+          modifiedOptions.max_completion_tokens = options.maxTokens;
+        }
+
+        // GPT-5はtemperature=1のみサポート
+        if (modifiedOptions.temperature !== undefined && modifiedOptions.temperature !== 1) {
+          delete modifiedOptions.temperature;
+        }
+
+        return originalDoStream.call(this, modifiedOptions);
+      };
+    }
+
+    return baseModel;
   }
 }
